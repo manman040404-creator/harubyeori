@@ -1,13 +1,26 @@
-# 하루벼리 정적 PWA v0.1
+# 하루벼리 GitHub Pages 배포용 v0.1
 
-이 폴더를 Netlify Drop, GitHub Pages, Vercel 등에 올리면 주소로 접속 가능한 웹앱이 됩니다.
+이 폴더 안의 파일들을 GitHub 저장소 최상단(root)에 올리세요.
 
-가장 쉬운 방법:
-1. https://app.netlify.com/drop 접속
-2. 이 zip을 풀어 나온 `harubyeori-static-pwa` 폴더 전체를 드래그 앤 드롭
-3. 생성된 주소를 지인에게 공유
-4. 휴대폰에서 주소 접속 후 Chrome/Safari 메뉴에서 '홈 화면에 추가' 또는 '설치'
+반드시 저장소 첫 화면에 아래 파일들이 바로 보여야 합니다.
+
+- index.html
+- manifest.webmanifest
+- sw.js
+- icon-192.png
+- icon-512.png
+- .nojekyll
+- README.txt
+
+GitHub Pages 설정:
+Settings → Pages
+Source: Deploy from a branch
+Branch: main
+Folder: / (root)
+
+주소 예시:
+https://manman040404-creator.github.io/harubyeori/
 
 주의:
-- 주소 클릭만으로 자동 설치는 모바일 보안 정책상 불가합니다.
-- 기록은 각 사용자의 휴대폰 브라우저에 저장됩니다.
+- 폴더째 올리지 말고, 폴더 안의 파일들을 저장소 최상단에 올리세요.
+- .nojekyll 파일은 GitHub Pages의 Jekyll 처리를 건너뛰게 하는 빈 파일입니다.
