@@ -14,8 +14,12 @@
       --gold:#b8945f;--gold2:#ddc79c;--line:rgba(184,148,95,.42);
       --shadow:rgba(50,35,15,.16);--danger:#8a3d32;
     }
-    *{box-sizing:border-box} body{margin:0;background:#eee1cb;color:var(--ink);font-family:'Noto Sans KR',system-ui,sans-serif;}
-    .app{min-height:100dvh;padding:14px 12px 92px;background:radial-gradient(circle at 20% 0%,rgba(255,255,255,.75),transparent 30%),linear-gradient(180deg,#f6eddd,#ecddc4);}
+    *{box-sizing:border-box}
+    html{height:100%; -webkit-text-size-adjust:100%;}
+    body{margin:0;min-height:100%;background:#eee1cb;color:var(--ink);font-family:'Noto Sans KR',system-ui,sans-serif;overscroll-behavior-y:none;}
+    button,input,textarea{font:inherit}
+    textarea,input{font-size:16px;} /* iOS zoom 방지 */
+    .app{min-height:100svh;padding:14px 12px calc(96px + env(safe-area-inset-bottom));background:radial-gradient(circle at 20% 0%,rgba(255,255,255,.75),transparent 30%),linear-gradient(180deg,#f6eddd,#ecddc4);}
     header{max-width:520px;margin:0 auto 12px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
     .eyebrow{font-size:12px;color:var(--gold);letter-spacing:.18em;margin:0 0 2px}
     header h1{margin:0;font-family:'Gowun Batang',serif;font-size:31px;letter-spacing:-.05em}
@@ -38,14 +42,17 @@
     .manifesto{display:grid;gap:12px}.manifesto p{margin:0;line-height:1.75;color:#3a3d3d}
     .guide{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.tile{min-height:116px;border:1px solid var(--line);border-radius:20px;background:rgba(255,250,241,.88);color:var(--ink);padding:14px 10px;display:grid;justify-items:center;gap:6px;box-shadow:0 10px 22px rgba(47,36,19,.08);text-align:center}.tile strong{font-family:'Gowun Batang',serif;font-size:21px}.tile span{font-size:11px;color:var(--muted);line-height:1.45}
     .field{display:grid;gap:8px;margin-bottom:14px}.field span{font-family:'Gowun Batang',serif;font-weight:700;font-size:16px}
-    textarea,.time input{width:100%;border:1px solid rgba(184,148,95,.33);border-radius:16px;background:rgba(255,255,255,.5);color:var(--ink);padding:12px 13px;outline:none;line-height:1.55}
-    textarea:focus,.time input:focus,input[type=date]:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,148,95,.13)} textarea{resize:vertical;min-height:76px}
+    textarea,.time input{width:100%;border:1px solid rgba(184,148,95,.33);border-radius:16px;background:rgba(255,255,255,.5);color:var(--ink);padding:12px 13px;outline:none;line-height:1.55;-webkit-appearance:none;appearance:none;}
+    textarea:focus,.time input:focus,input[type=date]:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,148,95,.13)}
+    textarea{resize:none;min-height:82px;overflow:auto}
     .time{display:grid;grid-template-columns:58px 1fr;gap:8px;align-items:center;margin-bottom:8px}.time span{text-align:right;font-family:'Gowun Batang',serif;color:var(--muted);font-size:14px}.time input{height:42px}
     .twocol{display:grid;grid-template-columns:1fr 1fr;gap:10px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.btn{border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.5);color:var(--ink);padding:9px 12px}.danger{color:var(--danger)}
     .record{width:100%;border:1px solid var(--line);background:rgba(255,255,255,.45);border-radius:14px;padding:12px;display:flex;gap:8px;text-align:left;color:var(--ink);margin-bottom:8px}.record.active{background:rgba(184,148,95,.16);border-color:var(--gold)}
-    nav{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);width:min(520px,calc(100% - 24px));display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:7px;background:rgba(255,250,241,.9);border:1px solid var(--line);border-radius:24px;backdrop-filter:blur(12px);box-shadow:0 14px 36px rgba(47,36,19,.2)}
+    .save-status{position:fixed;left:50%;bottom:calc(80px + env(safe-area-inset-bottom));transform:translateX(-50%);background:rgba(36,48,56,.88);color:#fff7e8;border-radius:999px;padding:6px 11px;font-size:11px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50}
+    .save-status.show{opacity:1}
+    nav{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(520px,calc(100% - 24px));display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:7px;background:rgba(255,250,241,.94);border:1px solid var(--line);border-radius:24px;backdrop-filter:blur(12px);box-shadow:0 14px 36px rgba(47,36,19,.2);z-index:40}
     nav button{border:0;border-radius:18px;background:transparent;color:var(--muted);padding:9px 4px 7px;display:grid;gap:2px;font-size:11px} nav button.active{background:var(--ink);color:#fff7e8}
-    .install{position:fixed;right:14px;top:14px;border:1px solid var(--line);background:rgba(255,250,241,.9);color:var(--muted);border-radius:999px;padding:7px 10px;font-size:12px}
+    .install{position:fixed;right:14px;top:14px;border:1px solid var(--line);background:rgba(255,250,241,.9);color:var(--muted);border-radius:999px;padding:7px 10px;font-size:12px;z-index:60}
     .install.hide{display:none}
     @media(max-width:430px){.app{padding-left:10px;padding-right:10px}header{align-items:flex-start}header h1{font-size:27px}input[type=date]{width:128px}.guide,.twocol{grid-template-columns:1fr}.hero{min-height:460px}.hero h2{font-size:54px}.tag{letter-spacing:.16em}}
   </style>
@@ -53,38 +60,72 @@
 <body>
 <div id="app" class="app"></div>
 <script>
-const KEY='harubyeori_entries_v01_static';
+const KEY='harubyeori_entries_v02_static';
+const OLD_KEY='harubyeori_entries_v01_static';
 const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
 const fmt=k=>{const [y,m,d]=k.split('-').map(Number);const dt=new Date(y,m-1,d);return `${y}년 ${m}월 ${d}일 ${['일','월','화','수','목','금','토'][dt.getDay()]}요일`};
 const hours=['06:00','07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00'];
 const empty=()=>({dump:{mind:'',emotion:'',worry:'',idea:'',memo:''},build:{big1:'',big2:'',big3:'',oneRule:'',pledge:'',remember:''},weave:{schedule:{},focus:'',memo:''}});
 let state={tab:'home',date:today(),entries:load(),deferred:null};
-function load(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return {}}}
-function save(){localStorage.setItem(KEY,JSON.stringify(state.entries));}
-function entry(){return JSON.parse(JSON.stringify(state.entries[state.date]||empty()))}
-function update(fn){let e=entry();fn(e);state.entries[state.date]=e;save();render();}
+let saveTimer=null;
+
+function load(){
+  try{
+    let data=localStorage.getItem(KEY);
+    if(!data && localStorage.getItem(OLD_KEY)){
+      data=localStorage.getItem(OLD_KEY);
+      localStorage.setItem(KEY,data);
+    }
+    return JSON.parse(data||'{}')
+  }catch(e){return {}}
+}
+function save(){
+  localStorage.setItem(KEY,JSON.stringify(state.entries));
+  const el=document.getElementById('saveStatus');
+  if(el){el.classList.add('show'); clearTimeout(saveTimer); saveTimer=setTimeout(()=>el.classList.remove('show'),700);}
+}
+function entry(){
+  const raw=state.entries[state.date]||empty();
+  const merged=empty();
+  return {
+    dump:{...merged.dump,...(raw.dump||{})},
+    build:{...merged.build,...(raw.build||{})},
+    weave:{...merged.weave,...(raw.weave||{}),schedule:{...(raw.weave&&raw.weave.schedule?raw.weave.schedule:{})}}
+  }
+}
+/* 핵심 수정: 입력 중에는 render() 하지 않음. DOM 유지 → 모바일 키보드/커서 튐 방지 */
+function setValue(section,key,value){
+  const e=entry();
+  e[section][key]=value;
+  state.entries[state.date]=e;
+  save();
+}
+function setScheduleValue(hour,value){
+  const e=entry();
+  e.weave.schedule[hour]=value;
+  state.entries[state.date]=e;
+  save();
+}
 const icon={home:'✦',dump:'✎',build:'✓',weave:'◷',records:'▤'};
-function field(label,val,oninput,ph='',rows=3){return `<label class="field"><span>${label}</span><textarea rows="${rows}" placeholder="${ph}" oninput="${oninput}">${escapeHtml(val||'')}</textarea></label>`}
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function field(label,val,oninput,ph='',rows=3){return `<label class="field"><span>${label}</span><textarea rows="${rows}" placeholder="${ph}" oninput="${oninput}">${escapeHtml(val||'')}</textarea></label>`}
 function title(t,sub,i){return `<div class="section-title"><div class="icon">${i}</div><div><h2>${t}</h2><p>${sub}</p></div></div>`}
 function home(){
 return `<div class="stack"><section class="card hero"><div class="sun"><div class="arc"></div><div class="dot"></div><div class="lines"><span></span><span></span><span></span></div></div><h2>하루벼리</h2><div class="orn"></div><p class="tag">비움 · 세움 · 엮음</p><p class="hero-date">${fmt(state.date)}</p><p class="hero-text">흩어진 마음을 비우고,<br>오늘의 뜻을 세우고,<br>시간을 엮어 하루를 살아낸다.</p></section>
 <section class="card">${title('하루벼리 선언문','이 노트는 할 일을 늘리는 도구가 아니라, 하루의 중심을 되찾는 의식입니다.','✦')}<div class="manifesto"><p>나는 오늘의 시작 앞에서 마음을 비운다. 머릿속을 떠도는 생각과 감정, 걱정과 기대를 억누르지 않고 적어 내려놓는다.</p><p>나는 오늘 반드시 해낼 뜻을 세운다. 수많은 일 중에서 내 하루를 움직일 핵심을 고르고, 그 일을 향해 조용히 힘을 모은다.</p><p>나는 시간을 엮어 하루를 살아낸다. 흘러가는 시간을 놓치지 않고, 나의 일과 몰입과 쉼을 한 줄로 이어 오늘을 완성한다.</p></div></section>
 <div class="guide"><button class="tile" onclick="go('dump')"><b>✎</b><strong>비움</strong><span>머릿속 생각과 감정을 자유롭게 적습니다.</span></button><button class="tile" onclick="go('build')"><b>✓</b><strong>세움</strong><span>오늘 반드시 해낼 중요한 세 가지를 적습니다.</span></button><button class="tile" onclick="go('weave')"><b>◷</b><strong>엮음</strong><span>시간의 흐름에 맞춰 하루를 배치합니다.</span></button></div></div>`}
-function dump(){const e=entry();return `<div class="stack"><section class="card">${title('비움','마음을 비우는 첫 기록','✎')}${field('지금 머릿속에 있는 것',e.dump.mind,`upd('dump','mind',this.value)`,'해야 할 일, 떠오르는 생각, 마음에 걸리는 것들을 모두 적어보세요.',5)}${field('감정',e.dump.emotion,`upd('dump','emotion',this.value)`,'지금 감정의 이름을 붙여봅니다.')}${field('걱정',e.dump.worry,`upd('dump','worry',this.value)`,'걱정을 적되, 오늘 내가 다룰 수 있는 것과 아닌 것을 구분해봅니다.')}${field('아이디어',e.dump.idea,`upd('dump','idea',this.value)`,'문득 떠오른 생각, 사업 아이디어, 문장, 해결책을 붙잡아둡니다.')}${field('메모',e.dump.memo,`upd('dump','memo',this.value)`,'그 밖에 남겨둘 말을 적습니다.')}</section></div>`}
-function build(){const e=entry();return `<div class="stack"><section class="card">${title('세움','오늘의 뜻을 세우는 기록','✓')}${field('오늘의 큰 세 가지 1',e.build.big1,`upd('build','big1',this.value)`,'오늘 반드시 해낼 첫 번째 핵심',2)}${field('오늘의 큰 세 가지 2',e.build.big2,`upd('build','big2',this.value)`,'오늘 반드시 해낼 두 번째 핵심',2)}${field('오늘의 큰 세 가지 3',e.build.big3,`upd('build','big3',this.value)`,'오늘 반드시 해낼 세 번째 핵심',2)}${field('꼭 지킬 한 가지',e.build.oneRule,`upd('build','oneRule',this.value)`,'오늘 무너지지 않기 위해 지킬 단 하나의 기준',2)}${field('오늘의 다짐',e.build.pledge,`upd('build','pledge',this.value)`,'나에게 건네는 짧은 문장')}${field('기억할 일',e.build.remember,`upd('build','remember',this.value)`,'약속, 전화, 확인할 일, 챙길 것')}</section></div>`}
-function weave(){const e=entry();return `<div class="stack"><section class="card">${title('엮음','시간을 엮어 하루를 사는 기록','◷')}<div>${hours.map(h=>`<label class="time"><span>${h}</span><input value="${escapeHtml(e.weave.schedule[h]||'')}" placeholder="무엇을 할 시간인가요?" oninput="updSchedule('${h}',this.value)"></label>`).join('')}</div><div class="twocol">${field('몰입',e.weave.focus,`upd('weave','focus',this.value)`,'오늘 가장 몰입할 시간과 주제',4)}${field('메모',e.weave.memo,`upd('weave','memo',this.value)`,'흐름을 놓치지 않기 위한 보조 메모',4)}</div></section></div>`}
+function dump(){const e=entry();return `<div class="stack"><section class="card">${title('비움','마음을 비우는 첫 기록','✎')}${field('지금 머릿속에 있는 것',e.dump.mind,`setValue('dump','mind',this.value)`,'해야 할 일, 떠오르는 생각, 마음에 걸리는 것들을 모두 적어보세요.',5)}${field('감정',e.dump.emotion,`setValue('dump','emotion',this.value)`,'지금 감정의 이름을 붙여봅니다.')}${field('걱정',e.dump.worry,`setValue('dump','worry',this.value)`,'걱정을 적되, 오늘 내가 다룰 수 있는 것과 아닌 것을 구분해봅니다.')}${field('아이디어',e.dump.idea,`setValue('dump','idea',this.value)`,'문득 떠오른 생각, 사업 아이디어, 문장, 해결책을 붙잡아둡니다.')}${field('메모',e.dump.memo,`setValue('dump','memo',this.value)`,'그 밖에 남겨둘 말을 적습니다.')}</section></div>`}
+function build(){const e=entry();return `<div class="stack"><section class="card">${title('세움','오늘의 뜻을 세우는 기록','✓')}${field('오늘의 큰 세 가지 1',e.build.big1,`setValue('build','big1',this.value)`,'오늘 반드시 해낼 첫 번째 핵심',2)}${field('오늘의 큰 세 가지 2',e.build.big2,`setValue('build','big2',this.value)`,'오늘 반드시 해낼 두 번째 핵심',2)}${field('오늘의 큰 세 가지 3',e.build.big3,`setValue('build','big3',this.value)`,'오늘 반드시 해낼 세 번째 핵심',2)}${field('꼭 지킬 한 가지',e.build.oneRule,`setValue('build','oneRule',this.value)`,'오늘 무너지지 않기 위해 지킬 단 하나의 기준',2)}${field('오늘의 다짐',e.build.pledge,`setValue('build','pledge',this.value)`,'나에게 건네는 짧은 문장')}${field('기억할 일',e.build.remember,`setValue('build','remember',this.value)`,'약속, 전화, 확인할 일, 챙길 것')}</section></div>`}
+function weave(){const e=entry();return `<div class="stack"><section class="card">${title('엮음','시간을 엮어 하루를 사는 기록','◷')}<div>${hours.map(h=>`<label class="time"><span>${h}</span><input value="${escapeHtml(e.weave.schedule[h]||'')}" placeholder="무엇을 할 시간인가요?" oninput="setScheduleValue('${h}',this.value)"></label>`).join('')}</div><div class="twocol">${field('몰입',e.weave.focus,`setValue('weave','focus',this.value)`,'오늘 가장 몰입할 시간과 주제',4)}${field('메모',e.weave.memo,`setValue('weave','memo',this.value)`,'흐름을 놓치지 않기 위한 보조 메모',4)}</div></section></div>`}
 function records(){const keys=Object.keys(state.entries).sort().reverse();return `<div class="stack"><section class="card">${title('기록','하루벼리에 남긴 날들을 모아봅니다.','▤')}<div class="actions"><button class="btn" onclick="exportData()">백업 내보내기</button><button class="btn danger" onclick="clearToday()">오늘 기록 비우기</button></div>${keys.length?keys.map(k=>`<button class="record ${k===state.date?'active':''}" onclick="state.date='${k}';render()">📅 ${fmt(k)}</button>`).join(''):'<p style="color:var(--muted)">아직 기록이 없습니다. 오늘의 비움부터 시작해보세요.</p>'}</section></div>`}
 function render(){
  const body={home:home,dump:dump,build:build,weave:weave,records:records}[state.tab]();
- document.getElementById('app').innerHTML=`<button id="installBtn" class="install hide">설치</button><header><div><p class="eyebrow">나의 아침 기록장</p><h1>하루벼리</h1></div><div class="datebox"><input type="date" value="${state.date}" onchange="state.date=this.value;render()"><span>자동 저장</span></div></header><main>${body}</main><nav>${['home','dump','build','weave','records'].map(t=>`<button class="${state.tab===t?'active':''}" onclick="go('${t}')"><span>${icon[t]}</span><span>${{home:'첫장',dump:'비움',build:'세움',weave:'엮음',records:'기록'}[t]}</span></button>`).join('')}</nav>`;
+ document.getElementById('app').innerHTML=`<button id="installBtn" class="install hide">설치</button><header><div><p class="eyebrow">나의 아침 기록장</p><h1>하루벼리</h1></div><div class="datebox"><input type="date" value="${state.date}" onchange="state.date=this.value;render()"><span>자동 저장</span></div></header><main>${body}</main><div id="saveStatus" class="save-status">저장됨</div><nav>${['home','dump','build','weave','records'].map(t=>`<button class="${state.tab===t?'active':''}" onclick="go('${t}')"><span>${icon[t]}</span><span>${{home:'첫장',dump:'비움',build:'세움',weave:'엮음',records:'기록'}[t]}</span></button>`).join('')}</nav>`;
  const b=document.getElementById('installBtn'); if(state.deferred){b.classList.remove('hide');b.onclick=async()=>{state.deferred.prompt();state.deferred=null;b.classList.add('hide');};}
 }
 function go(t){state.tab=t;render()}
-function upd(section,key,value){update(e=>{e[section][key]=value})}
-function updSchedule(h,value){update(e=>{e.weave.schedule[h]=value})}
 function clearToday(){if(confirm(fmt(state.date)+' 기록을 비울까요?')){delete state.entries[state.date];save();render()}}
-function exportData(){const blob=new Blob([JSON.stringify({app:'하루벼리',version:'0.1-static',exportedAt:new Date().toISOString(),entries:state.entries},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='harubyeori-backup-'+today()+'.json';a.click();URL.revokeObjectURL(a.href)}
+function exportData(){const blob=new Blob([JSON.stringify({app:'하루벼리',version:'0.2-static',exportedAt:new Date().toISOString(),entries:state.entries},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='harubyeori-backup-'+today()+'.json';a.click();URL.revokeObjectURL(a.href)}
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();state.deferred=e;render()});
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'))}
 render();
