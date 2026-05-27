@@ -1,1 +1,339 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>하루벼리</title><style>body{font-family:sans-serif;background:#f6eddd;padding:20px;color:#243038}textarea,input{width:100%;font-size:16px;margin:6px 0 14px;padding:10px}button,label{display:inline-block;margin:5px;padding:10px 12px;border:1px solid #b8945f;border-radius:20px;background:#fff8ed}.card{background:#fff8ed;border:1px solid #b8945f;border-radius:20px;padding:18px;max-width:560px;margin:auto}img{max-width:100%;border-radius:12px}</style></head><body><div class='card'><h1>하루벼리 v0.4</h1><p>비움 · 세움 · 엮음</p><input type='date' id='date'><textarea id='memo' rows='10' placeholder='오늘의 기록'></textarea><button onclick='save()'>저장</button><button onclick='exportBackup()'>전체 백업</button><label>백업 불러오기<input type='file' accept='application/json' onchange='importBackup(this)' style='display:none'></label><hr><input type='file' accept='image/*' onchange='addPhoto(this)'><div id='photos'></div></div><script>const KEY='hb_v04_simple';let date=document.getElementById('date');let memo=document.getElementById('memo');date.value=new Date().toISOString().slice(0,10);let data=JSON.parse(localStorage.getItem(KEY)||'{}');function cur(){return data[date.value]||(data[date.value]={memo:'',photos:[]})}function render(){memo.value=cur().memo||'';photos.innerHTML=(cur().photos||[]).map((p,i)=>`<div><img src="${p.data}"><textarea oninput="cur().photos[${i}].note=this.value;persist()" placeholder="사진 메모">${p.note||''}</textarea><button onclick="cur().photos.splice(${i},1);persist();render()">삭제</button></div>`).join('')}function persist(){localStorage.setItem(KEY,JSON.stringify(data))}function save(){cur().memo=memo.value;persist();alert('저장됨')}date.onchange=render;memo.oninput=()=>{cur().memo=memo.value;persist()};function addPhoto(input){let f=input.files[0];if(!f)return;if(cur().photos.length>=2){alert('사진은 날짜별 2장까지');return}let r=new FileReader();r.onload=()=>{cur().photos.push({data:r.result,note:''});persist();render()};r.readAsDataURL(f)}function exportBackup(){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({app:'하루벼리',version:'0.4-simple',data},null,2)],{type:'application/json'}));a.download='harubyeori-full-backup.json';a.click()}async function importBackup(input){let f=input.files[0];if(!f)return;let obj=JSON.parse(await f.text());if(obj.data)data={...data,...obj.data};persist();render()}render()</script></body></html>
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f6eddd" />
+  <meta name="description" content="하루벼리 - 비움 · 세움 · 엮음 디지털 다이어리" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <title>하루벼리</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap');
+    :root{
+      --paper:#fff8ed;--paper2:#f8f0e1;--ink:#243038;--muted:#776b5a;
+      --gold:#b8945f;--gold2:#ddc79c;--line:rgba(184,148,95,.42);
+      --shadow:rgba(50,35,15,.16);--danger:#8a3d32;--green:#476253;
+    }
+    *{box-sizing:border-box}
+    html{height:100%;-webkit-text-size-adjust:100%}
+    body{margin:0;min-height:100%;background:#eee1cb;color:var(--ink);font-family:'Noto Sans KR',system-ui,sans-serif;overscroll-behavior-y:none}
+    button,input,textarea{font:inherit}
+    textarea,input{font-size:16px}
+    .app{min-height:100svh;padding:14px 12px calc(96px + env(safe-area-inset-bottom));background:radial-gradient(circle at 20% 0%,rgba(255,255,255,.75),transparent 30%),linear-gradient(180deg,#f6eddd,#ecddc4)}
+    header{max-width:520px;margin:0 auto 12px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+    .eyebrow{font-size:12px;color:var(--gold);letter-spacing:.18em;margin:0 0 2px}
+    header h1{margin:0;font-family:'Gowun Batang',serif;font-size:31px;letter-spacing:-.05em}
+    .datebox{display:grid;gap:3px;justify-items:end;font-size:11px;color:var(--muted)}
+    input[type=date]{border:1px solid var(--line);border-radius:999px;background:rgba(255,250,241,.9);padding:7px 9px;color:var(--ink);width:135px}
+    main{max-width:520px;margin:0 auto}
+    .stack{display:grid;gap:14px}
+    .card{position:relative;background:linear-gradient(90deg,rgba(184,148,95,.04) 1px,transparent 1px),linear-gradient(180deg,rgba(184,148,95,.035) 1px,transparent 1px),var(--paper);background-size:28px 28px,28px 28px,auto;border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 16px 34px var(--shadow);overflow:hidden}
+    .card:before{content:"";position:absolute;inset:10px;border:1px solid rgba(184,148,95,.25);border-radius:16px;pointer-events:none}
+    .hero{min-height:500px;text-align:center;display:grid;justify-items:center;align-content:start;padding-top:38px}
+    .sun{position:relative;width:82px;height:62px;margin-bottom:28px;color:var(--gold)}
+    .sun .dot{position:absolute;left:50%;top:25px;width:22px;height:22px;transform:translateX(-50%);background:var(--gold);border-radius:50%}
+    .sun .arc{position:absolute;left:50%;top:5px;width:64px;height:64px;transform:translateX(-50%);border-top:2px solid currentColor;border-radius:50%}
+    .sun .lines{position:absolute;left:5px;right:5px;bottom:12px;display:grid;gap:5px}
+    .sun .lines span{height:2px;background:currentColor;border-radius:99px;opacity:.72}
+    .sun .lines span:nth-child(2){width:78%;margin:0 auto}
+    .sun .lines span:nth-child(3){width:56%;margin:0 auto}
+    .hero h2{margin:0;font-family:'Gowun Batang',serif;font-size:clamp(48px,13vw,72px);letter-spacing:-.08em;line-height:1.05}
+    .orn{width:124px;height:1px;background:var(--gold2);margin:26px 0 18px;position:relative}
+    .orn:after{content:"◇";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--paper);color:var(--gold);padding:0 8px;font-size:15px}
+    .tag{margin:0;font-family:'Gowun Batang',serif;font-size:19px;letter-spacing:.22em}
+    .hero-date{margin:22px 0 0;color:var(--gold);font-size:13px}
+    .hero-text{margin:28px 0 0;font-family:'Gowun Batang',serif;font-size:22px;line-height:2}
+    .section-title{display:flex;gap:12px;align-items:center;margin-bottom:18px}
+    .icon{width:42px;height:42px;display:grid;place-items:center;border:1px solid var(--line);border-radius:16px;color:var(--gold);background:rgba(255,255,255,.35)}
+    .section-title h2{margin:0;font-family:'Gowun Batang',serif;font-size:26px}
+    .section-title p{margin:3px 0 0;color:var(--muted);font-size:13px;line-height:1.45}
+    .manifesto{display:grid;gap:12px}
+    .manifesto p{margin:0;line-height:1.75;color:#3a3d3d}
+    .guide{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .tile{min-height:116px;border:1px solid var(--line);border-radius:20px;background:rgba(255,250,241,.88);color:var(--ink);padding:14px 10px;display:grid;justify-items:center;gap:6px;box-shadow:0 10px 22px rgba(47,36,19,.08);text-align:center}
+    .tile strong{font-family:'Gowun Batang',serif;font-size:21px}
+    .tile span{font-size:11px;color:var(--muted);line-height:1.45}
+    .field{display:grid;gap:8px;margin-bottom:14px}
+    .field span{font-family:'Gowun Batang',serif;font-weight:700;font-size:16px}
+    textarea,.time input{width:100%;border:1px solid rgba(184,148,95,.33);border-radius:16px;background:rgba(255,255,255,.5);color:var(--ink);padding:12px 13px;outline:none;line-height:1.55;-webkit-appearance:none;appearance:none}
+    textarea:focus,.time input:focus,input[type=date]:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(184,148,95,.13)}
+    textarea{resize:none;min-height:82px;overflow:auto}
+    .time{display:grid;grid-template-columns:58px 1fr;gap:8px;align-items:center;margin-bottom:8px}
+    .time span{text-align:right;font-family:'Gowun Batang',serif;color:var(--muted);font-size:14px}
+    .time input{height:42px}
+    .twocol{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+    .btn{border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.5);color:var(--ink);padding:9px 12px;display:inline-flex;align-items:center;gap:4px}
+    .danger{color:var(--danger)}
+    .record{width:100%;border:1px solid var(--line);background:rgba(255,255,255,.45);border-radius:14px;padding:12px;display:flex;gap:8px;text-align:left;color:var(--ink);margin-bottom:8px}
+    .record.active{background:rgba(184,148,95,.16);border-color:var(--gold)}
+    .photo-panel{margin-top:16px;border-top:1px solid var(--line);padding-top:16px}
+    .photo-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+    .photo-head strong{font-family:'Gowun Batang',serif;font-size:20px}
+    .photo-count{font-size:12px;color:var(--muted)}
+    .file-wrap{border:1px dashed rgba(184,148,95,.58);border-radius:18px;background:rgba(255,255,255,.35);padding:14px;text-align:center;margin-bottom:12px}
+    .file-wrap input{display:none}
+    .file-label{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);border-radius:999px;background:var(--ink);color:#fff7e8;padding:10px 14px}
+    .photo-help{margin:8px 0 0;color:var(--muted);font-size:12px;line-height:1.45}
+    .photos{display:grid;gap:12px}
+    .photo-card{border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.44);padding:10px;overflow:hidden}
+    .photo-card img{width:100%;max-height:280px;object-fit:cover;border-radius:13px;display:block;background:#ddd}
+    .photo-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:9px 0 7px;color:var(--muted);font-size:12px}
+    .photo-note{min-height:66px;margin-top:8px}
+    .small-delete{border:1px solid rgba(138,61,50,.22);color:var(--danger);background:rgba(255,255,255,.4);border-radius:999px;padding:6px 9px;font-size:12px}
+    .empty-photo{border:1px solid rgba(184,148,95,.25);border-radius:16px;padding:16px;color:var(--muted);text-align:center;line-height:1.55;background:rgba(255,255,255,.28)}
+    .save-status{position:fixed;left:50%;bottom:calc(80px + env(safe-area-inset-bottom));transform:translateX(-50%);background:rgba(36,48,56,.88);color:#fff7e8;border-radius:999px;padding:6px 11px;font-size:11px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50}
+    .save-status.show{opacity:1}
+    nav{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(520px,calc(100% - 24px));display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:7px;background:rgba(255,250,241,.94);border:1px solid var(--line);border-radius:24px;backdrop-filter:blur(12px);box-shadow:0 14px 36px rgba(47,36,19,.2);z-index:40}
+    nav button{border:0;border-radius:18px;background:transparent;color:var(--muted);padding:9px 4px 7px;display:grid;gap:2px;font-size:11px}
+    nav button.active{background:var(--ink);color:#fff7e8}
+    .install{position:fixed;right:14px;top:14px;border:1px solid var(--line);background:rgba(255,250,241,.9);color:var(--muted);border-radius:999px;padding:7px 10px;font-size:12px;z-index:60}
+    .install.hide{display:none}
+    @media(max-width:430px){
+      .app{padding-left:10px;padding-right:10px}
+      header{align-items:flex-start}
+      header h1{font-size:27px}
+      input[type=date]{width:128px}
+      .guide,.twocol{grid-template-columns:1fr}
+      .hero{min-height:460px}
+      .hero h2{font-size:54px}
+      .tag{letter-spacing:.16em}
+    }
+  </style>
+</head>
+<body>
+<div id="app" class="app"></div>
+<script>
+const KEY='harubyeori_entries_v041_static';
+const OLD_KEYS=['harubyeori_entries_v04_static','harubyeori_entries_v03_static','harubyeori_entries_v02_static','harubyeori_entries_v01_static'];
+const DB_NAME='harubyeori_photo_db_v01';
+const STORE='photos';
+const MAX_PHOTOS=2;
+const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+const fmt=k=>{const [y,m,d]=k.split('-').map(Number);const dt=new Date(y,m-1,d);return `${y}년 ${m}월 ${d}일 ${['일','월','화','수','목','금','토'][dt.getDay()]}요일`};
+const hours=['06:00','07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00'];
+const empty=()=>({dump:{mind:'',emotion:'',worry:'',idea:'',memo:''},build:{big1:'',big2:'',big3:'',oneRule:'',pledge:'',remember:''},weave:{schedule:{},focus:'',memo:''}});
+let state={tab:'home',date:today(),entries:load(),photos:[],deferred:null,db:null};
+let saveTimer=null;
+
+function load(){
+  try{
+    let data=localStorage.getItem(KEY);
+    if(!data){
+      for(const k of OLD_KEYS){if(localStorage.getItem(k)){data=localStorage.getItem(k);break;}}
+      if(data) localStorage.setItem(KEY,data);
+    }
+    return JSON.parse(data||'{}')
+  }catch(e){return {}}
+}
+function save(){
+  localStorage.setItem(KEY,JSON.stringify(state.entries));
+  showSaved();
+}
+function showSaved(msg='저장됨'){
+  const el=document.getElementById('saveStatus');
+  if(el){el.textContent=msg;el.classList.add('show');clearTimeout(saveTimer);saveTimer=setTimeout(()=>el.classList.remove('show'),900);}
+}
+function entry(){
+  const raw=state.entries[state.date]||empty();
+  const merged=empty();
+  return {dump:{...merged.dump,...(raw.dump||{})},build:{...merged.build,...(raw.build||{})},weave:{...merged.weave,...(raw.weave||{}),schedule:{...(raw.weave&&raw.weave.schedule?raw.weave.schedule:{})}}}
+}
+function setValue(section,key,value){const e=entry();e[section][key]=value;state.entries[state.date]=e;save();}
+function setScheduleValue(hour,value){const e=entry();e.weave.schedule[hour]=value;state.entries[state.date]=e;save();}
+
+function openDB(){
+  return new Promise((resolve,reject)=>{
+    if(state.db) return resolve(state.db);
+    const req=indexedDB.open(DB_NAME,1);
+    req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(STORE)){const s=db.createObjectStore(STORE,{keyPath:'id'});s.createIndex('date','date',{unique:false});}};
+    req.onsuccess=()=>{state.db=req.result;resolve(state.db)};
+    req.onerror=()=>reject(req.error);
+  });
+}
+async function getPhotos(date){
+  const db=await openDB();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(STORE,'readonly');
+    const idx=tx.objectStore(STORE).index('date');
+    const req=idx.getAll(date);
+    req.onsuccess=()=>resolve((req.result||[]).sort((a,b)=>a.createdAt-b.createdAt));
+    req.onerror=()=>reject(req.error);
+  });
+}
+async function getAllPhotos(){
+  const db=await openDB();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(STORE,'readonly');
+    const req=tx.objectStore(STORE).getAll();
+    req.onsuccess=()=>resolve(req.result||[]);
+    req.onerror=()=>reject(req.error);
+  });
+}
+async function putPhoto(photo){
+  const db=await openDB();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(STORE,'readwrite');
+    tx.objectStore(STORE).put(photo);
+    tx.oncomplete=()=>resolve();
+    tx.onerror=()=>reject(tx.error);
+  });
+}
+async function deletePhotoFromDB(id){
+  const db=await openDB();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(STORE,'readwrite');
+    tx.objectStore(STORE).delete(id);
+    tx.oncomplete=()=>resolve();
+    tx.onerror=()=>reject(tx.error);
+  });
+}
+function compressImage(file,maxSize=1280,quality=.72){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        let w=img.width,h=img.height;
+        const ratio=Math.min(1,maxSize/Math.max(w,h));
+        w=Math.round(w*ratio);h=Math.round(h*ratio);
+        const canvas=document.createElement('canvas');
+        canvas.width=w;canvas.height=h;
+        const ctx=canvas.getContext('2d');
+        ctx.drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL('image/jpeg',quality));
+      };
+      img.onerror=reject;
+      img.src=reader.result;
+    };
+    reader.onerror=reject;
+    reader.readAsDataURL(file);
+  });
+}
+async function handlePhotoUpload(input){
+  const files=Array.from(input.files||[]);
+  if(!files.length) return;
+  await openDB();
+  let current=await getPhotos(state.date);
+  const remain=MAX_PHOTOS-current.length;
+  if(remain<=0){alert('하루에 사진은 최대 2장까지 저장할 수 있어요.'); input.value=''; return;}
+  const selected=files.slice(0,remain);
+  if(files.length>remain) alert(`이 날짜에는 ${remain}장만 더 저장할 수 있어요.`);
+  showSaved('사진 처리 중');
+  for(const file of selected){
+    if(!file.type.startsWith('image/')) continue;
+    const dataUrl=await compressImage(file);
+    const photo={id:`${state.date}-${Date.now()}-${Math.random().toString(36).slice(2)}`,date:state.date,createdAt:Date.now(),name:file.name||'photo',dataUrl,note:''};
+    await putPhoto(photo);
+  }
+  input.value='';
+  state.photos=await getPhotos(state.date);
+  showSaved('사진 저장됨');
+  render();
+}
+async function updatePhotoNote(id,value){
+  const photo=state.photos.find(p=>p.id===id);
+  if(!photo) return;
+  photo.note=value;
+  await putPhoto(photo);
+  showSaved();
+}
+async function removePhoto(id){
+  if(!confirm('이 사진을 삭제할까요?')) return;
+  await deletePhotoFromDB(id);
+  state.photos=await getPhotos(state.date);
+  showSaved('사진 삭제됨');
+  render();
+}
+async function exportFullBackup(){
+  try{
+    showSaved('백업 생성 중');
+    const photos=await getAllPhotos();
+    const payload={
+      app:'하루벼리',
+      version:'0.4.1-full-backup',
+      exportedAt:new Date().toISOString(),
+      entries:state.entries,
+      photos,
+      notice:'이 파일에는 하루벼리 글 기록, 사진, 사진 메모가 포함됩니다. 개인 사진이 들어 있으니 안전하게 보관하세요.'
+    };
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='harubyeori-full-backup-'+today()+'.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    showSaved('전체 백업 완료');
+  }catch(e){
+    alert('백업 중 오류가 발생했습니다. 사진이 너무 많거나 저장 용량이 클 수 있어요.');
+    console.error(e);
+  }
+}
+async function importFullBackup(input){
+  const file=input.files && input.files[0];
+  if(!file) return;
+  const ok=confirm('백업 파일을 불러오면 현재 기기의 하루벼리 기록과 사진에 합쳐집니다. 같은 날짜 기록은 백업 파일 내용으로 덮어쓸 수 있습니다. 계속할까요?');
+  if(!ok){input.value='';return;}
+  try{
+    const text=await file.text();
+    const data=JSON.parse(text);
+    if(!data || !data.entries){throw new Error('invalid backup');}
+    state.entries={...state.entries,...data.entries};
+    localStorage.setItem(KEY,JSON.stringify(state.entries));
+    if(Array.isArray(data.photos)){
+      showSaved('사진 복원 중');
+      for(const p of data.photos){
+        if(p && p.id && p.date && p.dataUrl){
+          await putPhoto(p);
+        }
+      }
+    }
+    state.photos=await getPhotos(state.date);
+    input.value='';
+    showSaved('복원 완료');
+    render();
+  }catch(e){
+    console.error(e);
+    alert('백업 파일을 불러오지 못했습니다. 하루벼리 백업 JSON 파일인지 확인해주세요.');
+    input.value='';
+  }
+}
+
+const icon={home:'✦',dump:'✎',build:'✓',weave:'◷',records:'▤'};
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function field(label,val,oninput,ph='',rows=3){return `<label class="field"><span>${label}</span><textarea rows="${rows}" placeholder="${ph}" oninput="${oninput}">${escapeHtml(val||'')}</textarea></label>`}
+function title(t,sub,i){return `<div class="section-title"><div class="icon">${i}</div><div><h2>${t}</h2><p>${sub}</p></div></div>`}
+function home(){
+return `<div class="stack"><section class="card hero"><div class="sun"><div class="arc"></div><div class="dot"></div><div class="lines"><span></span><span></span><span></span></div></div><h2>하루벼리</h2><div class="orn"></div><p class="tag">비움 · 세움 · 엮음</p><p class="hero-date">${fmt(state.date)}</p><p class="hero-text">흩어진 마음을 비우고,<br>오늘의 뜻을 세우고,<br>시간을 엮어 하루를 살아낸다.</p></section>
+<section class="card">${title('하루벼리 선언문','이 노트는 할 일을 늘리는 도구가 아니라, 하루의 중심을 되찾는 의식입니다.','✦')}<div class="manifesto"><p>나는 오늘의 시작 앞에서 마음을 비운다. 머릿속을 떠도는 생각과 감정, 걱정과 기대를 억누르지 않고 적어 내려놓는다.</p><p>나는 오늘 반드시 해낼 뜻을 세운다. 수많은 일 중에서 내 하루를 움직일 핵심을 고르고, 그 일을 향해 조용히 힘을 모은다.</p><p>나는 시간을 엮어 하루를 살아낸다. 흘러가는 시간을 놓치지 않고, 나의 일과 몰입과 쉼을 한 줄로 이어 오늘을 완성한다.</p><p>그리고 오늘의 장면을 남긴다. 말로 다 적히지 않는 하루의 온도와 표정을 사진 한두 장에 담아, 시간이 지난 뒤에도 그날의 나를 다시 만난다.</p></div></section>
+<div class="guide"><button class="tile" onclick="go('dump')"><b>✎</b><strong>비움</strong><span>머릿속 생각과 감정을 자유롭게 적습니다.</span></button><button class="tile" onclick="go('build')"><b>✓</b><strong>세움</strong><span>오늘 반드시 해낼 중요한 세 가지를 적습니다.</span></button><button class="tile" onclick="go('weave')"><b>◷</b><strong>엮음</strong><span>시간의 흐름에 맞춰 하루를 배치합니다.</span></button></div></div>`}
+function dump(){const e=entry();return `<div class="stack"><section class="card">${title('비움','마음을 비우는 첫 기록','✎')}${field('지금 머릿속에 있는 것',e.dump.mind,`setValue('dump','mind',this.value)`,'해야 할 일, 떠오르는 생각, 마음에 걸리는 것들을 모두 적어보세요.',5)}${field('감정',e.dump.emotion,`setValue('dump','emotion',this.value)`,'지금 감정의 이름을 붙여봅니다.')}${field('걱정',e.dump.worry,`setValue('dump','worry',this.value)`,'걱정을 적되, 오늘 내가 다룰 수 있는 것과 아닌 것을 구분해봅니다.')}${field('아이디어',e.dump.idea,`setValue('dump','idea',this.value)`,'문득 떠오른 생각, 사업 아이디어, 문장, 해결책을 붙잡아둡니다.')}${field('메모',e.dump.memo,`setValue('dump','memo',this.value)`,'그 밖에 남겨둘 말을 적습니다.')}</section></div>`}
+function build(){const e=entry();return `<div class="stack"><section class="card">${title('세움','오늘의 뜻을 세우는 기록','✓')}${field('오늘의 큰 세 가지 1',e.build.big1,`setValue('build','big1',this.value)`,'오늘 반드시 해낼 첫 번째 핵심',2)}${field('오늘의 큰 세 가지 2',e.build.big2,`setValue('build','big2',this.value)`,'오늘 반드시 해낼 두 번째 핵심',2)}${field('오늘의 큰 세 가지 3',e.build.big3,`setValue('build','big3',this.value)`,'오늘 반드시 해낼 세 번째 핵심',2)}${field('꼭 지킬 한 가지',e.build.oneRule,`setValue('build','oneRule',this.value)`,'오늘 무너지지 않기 위해 지킬 단 하나의 기준',2)}${field('오늘의 다짐',e.build.pledge,`setValue('build','pledge',this.value)`,'나에게 건네는 짧은 문장')}${field('기억할 일',e.build.remember,`setValue('build','remember',this.value)`,'약속, 전화, 확인할 일, 챙길 것')}</section></div>`}
+function weave(){const e=entry();return `<div class="stack"><section class="card">${title('엮음','시간을 엮어 하루를 사는 기록','◷')}<div>${hours.map(h=>`<label class="time"><span>${h}</span><input value="${escapeHtml(e.weave.schedule[h]||'')}" placeholder="무엇을 할 시간인가요?" oninput="setScheduleValue('${h}',this.value)"></label>`).join('')}</div><div class="twocol">${field('몰입',e.weave.focus,`setValue('weave','focus',this.value)`,'오늘 가장 몰입할 시간과 주제',4)}${field('메모',e.weave.memo,`setValue('weave','memo',this.value)`,'흐름을 놓치지 않기 위한 보조 메모',4)}</div></section></div>`}
+function photoPanel(){
+ const count=state.photos.length;
+ return `<div class="photo-panel"><div class="photo-head"><strong>오늘의 장면</strong><span class="photo-count">${count}/${MAX_PHOTOS}장</span></div>
+ <div class="file-wrap"><label class="file-label">＋ 사진 추가<input type="file" accept="image/*" multiple onchange="handlePhotoUpload(this)"></label><p class="photo-help">날짜별 최대 2장까지 저장됩니다. 용량을 줄이기 위해 자동 압축 후 이 기기에 보관됩니다. 전체 백업을 하면 사진도 JSON에 포함됩니다.</p></div>
+ <div class="photos">${count?state.photos.map(p=>`<div class="photo-card"><img src="${p.dataUrl}" alt="하루벼리 사진"><div class="photo-meta"><span>${new Date(p.createdAt).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}</span><button class="small-delete" onclick="removePhoto('${p.id}')">삭제</button></div><label class="field"><span>사진 메모</span><textarea class="photo-note" placeholder="이 장면에 남기고 싶은 말을 적어보세요." oninput="updatePhotoNote('${p.id}',this.value)">${escapeHtml(p.note||'')}</textarea></label></div>`).join(''):`<div class="empty-photo">아직 저장된 사진이 없습니다.<br>가족, 여행, 일, 마음에 남은 장면을 한두 장만 남겨보세요.</div>`}</div></div>`
+}
+function records(){
+ const keys=Object.keys(state.entries).sort().reverse();
+ if(!keys.includes(state.date)) keys.unshift(state.date);
+ const unique=[...new Set(keys)];
+ return `<div class="stack"><section class="card">${title('기록','날짜별 글과 사진을 다시 봅니다.','▤')}<div class="actions"><button class="btn" onclick="exportFullBackup()">전체 백업</button><label class="btn">백업 불러오기<input style="display:none" type="file" accept="application/json" onchange="importFullBackup(this)"></label><button class="btn" onclick="exportTextOnly()">텍스트만 백업</button><button class="btn danger" onclick="clearToday()">선택 날짜 글 비우기</button></div><p style="color:var(--muted);font-size:13px;line-height:1.55;margin-top:0">아래 날짜를 누르면 그날의 기록과 사진을 관리할 수 있습니다.</p>${unique.map(k=>`<button class="record ${k===state.date?'active':''}" onclick="selectDate('${k}')">📅 ${fmt(k)} ${k===today()?' · 오늘':''}</button>`).join('')}${photoPanel()}</section></div>`
+}
+function render(){
+ const body={home:home,dump:dump,build:build,weave:weave,records:records}[state.tab]();
+ document.getElementById('app').innerHTML=`<button id="installBtn" class="install hide">설치</button><header><div><p class="eyebrow">나의 아침 기록장</p><h1>하루벼리</h1></div><div class="datebox"><input type="date" value="${state.date}" onchange="selectDate(this.value)"><span>자동 저장</span></div></header><main>${body}</main><div id="saveStatus" class="save-status">저장됨</div><nav>${['home','dump','build','weave','records'].map(t=>`<button class="${state.tab===t?'active':''}" onclick="go('${t}')"><span>${icon[t]}</span><span>${{home:'첫장',dump:'비움',build:'세움',weave:'엮음',records:'기록'}[t]}</span></button>`).join('')}</nav>`;
+ const b=document.getElementById('installBtn'); if(state.deferred){b.classList.remove('hide');b.onclick=async()=>{state.deferred.prompt();state.deferred=null;b.classList.add('hide');};}
+}
+async function selectDate(k){state.date=k;if(state.tab==='records'){state.photos=await getPhotos(state.date);}render();}
+async function go(t){state.tab=t;if(t==='records'){state.photos=await getPhotos(state.date);}render();}
+function clearToday(){if(confirm(fmt(state.date)+' 글 기록을 비울까요? 사진은 삭제되지 않습니다.')){delete state.entries[state.date];save();render()}}
+function exportTextOnly(){const blob=new Blob([JSON.stringify({app:'하루벼리',version:'0.4.1-text-only',exportedAt:new Date().toISOString(),entries:state.entries,notice:'텍스트 전용 백업입니다. 사진까지 옮기려면 전체 백업을 사용하세요.'},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='harubyeori-text-backup-'+today()+'.json';a.click();URL.revokeObjectURL(a.href)}
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();state.deferred=e;render()});
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'))}
+openDB().then(()=>render()).catch(()=>render());
+</script>
+</body>
+</html>
